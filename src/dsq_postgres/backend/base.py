@@ -6,7 +6,7 @@ from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper, \
   DatabaseFeatures, DatabaseOperations, DatabaseClient, DatabaseCreation, \
   DatabaseIntrospection
 
-from dsq_postgres.decorators import capture_transaction_exceptions, auto_reconnect_cursor, \
+from dsq_postgres.backend.decorators import capture_transaction_exceptions, auto_reconnect_cursor, \
   send_set_time_zone, auto_reconnect_connection
 from dsq_postgres.signals import db_reconnect, connection_created
 
@@ -22,20 +22,12 @@ class CursorWrapper(object):
     from cursors, such as auto reconnects and lazy time zone evaluation.
     """
 
-    def __init__(self, db):
+    def __init__(self, db, cursor):
         self.db = db
-        self._cursor = None
+        self.cursor = cursor
 
     def __getattr__(self, attr):
-        # HACK: fuck proxies
-        if attr == 'cursor':
-            return self.get_cursor()
         return getattr(self.cursor, attr)
-
-    def get_cursor(self):
-        if self._cursor is None:
-            self._cursor = self.db.make_cursor()
-        return self._cursor
 
     @capture_transaction_exceptions
     @auto_reconnect_cursor
@@ -65,15 +57,19 @@ class DatabaseWrapper(DatabaseWrapper):
         self._needs_tz = True
 
     @auto_reconnect_connection
-    def _set_isolation_level(self, *args, **kwargs):
+    def _set_isolation_level(self, level):
+        if getattr(self, 'isolation_level', None) == level:
+            return
+
         # When we change isolation levels we need to ensure we send "SET TIME ZONE" in case
         # we rolled back a transaction and that was part of the rollback
         self._needs_tz = True
-        return super(DatabaseWrapper, self)._set_isolation_level(*args, **kwargs)
+
+        return super(DatabaseWrapper, self)._set_isolation_level(level)
 
     @auto_reconnect_connection
     def _cursor(self, *args, **kwargs):
-        return CursorWrapper(self)
+        return CursorWrapper(self, self.make_cursor())
 
     def make_cursor(self):
         """
@@ -109,7 +105,7 @@ class DatabaseWrapper(DatabaseWrapper):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
 
-        return CursorWrapper(cursor)
+        return cursor
 
     def close(self, reconnect=False):
         """
@@ -128,10 +124,16 @@ class DatabaseWrapper(DatabaseWrapper):
                     pass
             self.connection = None
 
+    def set_autocommit(self):
+        self._set_isolation_level(0)
+
+    def set_default_commit(self, commit=False):
+        level = int(not self.settings_dict['OPTIONS'].get('autocommit', False))
+        self._set_isolation_level(level)
+
 
 class DatabaseFeatures(DatabaseFeatures):
     can_return_id_from_insert = True
 
     def __init__(self, connection):
-        super(DatabaseFeatures, self).__init__()
         self.connection = connection

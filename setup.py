@@ -23,20 +23,17 @@ else:
     setup_requires = []
 
 tests_require = [
-    'nose>=1.0',
+    'django-nose==1.1.',
+    'nose==1.0',
     'mock==0.8',
-    'unittest2==0.5.1',
 ]
 
 requires = [
-    'psycopg2'
+    'psycopg2',
+    'Django>=1.2,<1.4',
 ]
 
 entry_points = {
-    # 'console_scripts': [
-    #     'foo = my_package.some_module:main_func',
-    #     'bar = other_module:some_func',
-    # ],
 }
 
 
