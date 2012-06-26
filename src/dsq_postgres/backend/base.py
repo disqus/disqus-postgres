@@ -116,8 +116,8 @@ class DatabaseWrapper(DatabaseWrapper):
         if reconnect:
             reconnect_attempt.send(sender=type(self), connection=self)
 
+        self._needs_tz = True
         if self.connection is not None:
-            self._needs_tz = True
             if not self.connection.closed:
                 try:
                     self.connection.close()
