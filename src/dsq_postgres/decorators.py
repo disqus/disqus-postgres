@@ -1,3 +1,11 @@
+"""
+dsq_postgres.decorators
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2010-2012 DISQUS.
+:license: Apache License 2.0, see LICENSE for more details.
+"""
+
 from django.conf import settings
 from django.db import connections, transaction, DEFAULT_DB_ALIAS
 from functools import wraps

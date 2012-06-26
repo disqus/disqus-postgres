@@ -1,3 +1,11 @@
+"""
+dsq_postgres.backend.decorators
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2010-2012 DISQUS.
+:license: Apache License 2.0, see LICENSE for more details.
+"""
+
 import sys
 
 from dsq_postgres.exceptions import TransactionAborted

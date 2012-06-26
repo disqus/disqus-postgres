@@ -1,3 +1,11 @@
+"""
+dsq_postgres.backend.base
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2010-2012 DISQUS.
+:license: Apache License 2.0, see LICENSE for more details.
+"""
+
 import psycopg2 as Database
 
 # Some of these imports are unused, but they are inherited from other engines

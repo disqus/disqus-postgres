@@ -42,6 +42,7 @@ setup(
     version='0.1.0',
     author="DISQUS",
     author_email="dev@disqus.com",
+    license='Apache License 2.0',
     package_dir={'': 'src'},
     packages=find_packages("src"),
     install_requires=requires,

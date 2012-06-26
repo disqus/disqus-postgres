@@ -1,3 +1,11 @@
+"""
+dsq_postgres.exceptions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2010-2012 DISQUS.
+:license: Apache License 2.0, see LICENSE for more details.
+"""
+
 import psycopg2
 import traceback
 
