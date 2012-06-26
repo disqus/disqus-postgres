@@ -78,7 +78,7 @@ def send_set_time_zone(func):
     Lazily sends a SET TIME ZONE command before a query is executed if it
     is pending (e.g. from an isolation level change).
     """
-    def set_tz(wrapper, query):
+    def set_tz(wrapper):
         if not wrapper.db._needs_tz:
             return
 
@@ -86,14 +86,12 @@ def send_set_time_zone(func):
         if not tz_info:
             return
 
-        if query.lower().startswith('SET TIME ZONE '):
-            return
-
         wrapper.cursor.execute("SET TIME ZONE %s", [tz_info])
+        wrapper.db._needs_tz = False
 
     @wraps(func)
-    def inner(self, query, *args, **kwargs):
-        set_tz(self, query)
+    def inner(self, *args, **kwargs):
+        set_tz(self)
 
-        return func(self, query, *args, **kwargs)
+        return func(self, *args, **kwargs)
     return inner

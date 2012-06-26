@@ -8,7 +8,7 @@ from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper, \
 
 from dsq_postgres.backend.decorators import capture_transaction_exceptions, auto_reconnect_cursor, \
   send_set_time_zone, auto_reconnect_connection
-from dsq_postgres.signals import db_reconnect, connection_created
+from dsq_postgres.signals import reconnect_attempt, connection_created
 
 
 __all__ = ('DatabaseWrapper', 'DatabaseFeatures', 'DatabaseOperations',
@@ -48,12 +48,12 @@ class DatabaseWrapper(DatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         ofeatures = self.features
-        # XXX: Compatibility with Django 1.3+ (which sends conn as first arg)
+        # HACK: Compatibility with Django 1.3+ (which sends conn as first arg)
         self.features = DatabaseFeatures(self)
         self.features.uses_savepoints = ofeatures.uses_savepoints
         self.features.uses_autocommit = ofeatures.uses_autocommit
 
-        # Do we need to send "SET TIME ZONE?"
+        # Do we need to send "SET TIME ZONE"?
         self._needs_tz = True
 
     @auto_reconnect_connection
@@ -81,6 +81,7 @@ class DatabaseWrapper(DatabaseWrapper):
             if settings_dict['NAME'] == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured("You need to specify NAME in your Django settings file.")
+
             conn_params = {
                 'database': settings_dict['NAME'],
             }
@@ -96,11 +97,12 @@ class DatabaseWrapper(DatabaseWrapper):
             if settings_dict['PORT']:
                 conn_params['port'] = settings_dict['PORT']
 
+            self._needs_tz = True
             self.connection = Database.connect(**conn_params)
             self.connection.set_client_encoding('UTF8')
             self.connection.set_isolation_level(self.isolation_level)
 
-            connection_created.send(sender=self.__class__, connection=self)
+            connection_created.send(sender=type(self), connection=self)
 
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
@@ -112,9 +114,10 @@ class DatabaseWrapper(DatabaseWrapper):
         This ensures we dont error if the connection has already been closed.
         """
         if reconnect:
-            db_reconnect.send(sender=type(self), connection=self)
+            reconnect_attempt.send(sender=type(self), connection=self)
 
         if self.connection is not None:
+            self._needs_tz = True
             if not self.connection.closed:
                 try:
                     self.connection.close()
