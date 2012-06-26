@@ -1,7 +1,7 @@
 import sys
 
 from dsq_postgres.exceptions import TransactionAborted
-from dsq_postgres.helpers import can_reconnect
+from dsq_postgres.backend.helpers import can_reconnect
 from functools import wraps
 
 
