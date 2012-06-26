@@ -7,7 +7,7 @@ It provides the following additionaly features:
 
 - Automatic reconnection when a connection is dropped under various conditions.
 - Improved tracebacks for transactional errors (e.g. TransactionAborted)
-- Forces SET TIME ZONE and cursors to be entirely lazy.
+- Delays SET TIME ZONE until your first query.
 - Adds a true @autocommit decorator which forces isolation level changes.
 
 Usage
