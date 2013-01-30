@@ -23,7 +23,7 @@ else:
     setup_requires = []
 
 tests_require = [
-    'django-nose==1.1.',
+    'django-nose==1.1',
     'nose==1.0',
     'mock==0.8',
 ]
@@ -46,7 +46,9 @@ setup(
     package_dir={'': 'src'},
     packages=find_packages("src"),
     install_requires=requires,
-    tests_require=tests_require,
+    extras_require={
+        'tests': tests_require,
+    },
     setup_requires=setup_requires,
     test_suite='nose.collector',
     entry_points=entry_points,
