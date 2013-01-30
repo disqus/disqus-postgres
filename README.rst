@@ -10,6 +10,8 @@ It provides the following additionaly features:
 - Delays SET TIME ZONE until your first query.
 - Adds a true @autocommit decorator which forces isolation level changes.
 
+.. note:: This backend was developed against Django 1.2.7, and some of these changes may no longer be relevant in later versions of Django.
+
 Usage
 =====
 
