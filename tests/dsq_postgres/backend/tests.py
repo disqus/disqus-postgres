@@ -47,7 +47,7 @@ class SetTimeZoneTest(TransactionTestCase):
         make_cursor().execute.assert_any_call('SELECT 2')
 
 
-class ReonnectTest(TransactionTestCase):
+class ReconnectTest(TransactionTestCase):
     @mock.patch('dsq_postgres.backend.base.DatabaseWrapper.make_cursor')
     def test_does_reconnect_on_interface_error(self, make_cursor):
         calls = [0]
