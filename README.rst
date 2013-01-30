@@ -3,7 +3,7 @@ disqus-postgres
 
 An enhanced psycopg2 backend for Django. This is more or less a collection of hacks.
 
-It provides the following additionaly features:
+It provides the following additional features:
 
 - Automatic reconnection when a connection is dropped under various conditions.
 - Improved tracebacks for transactional errors (e.g. TransactionAborted)
