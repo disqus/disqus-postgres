@@ -1,6 +1,6 @@
 build:
-	pip install -e .
-	pip install "file://`pwd`#egg=dsq-postgres[tests]"
+	pip install -e . --use-mirrors
+	pip install "file://`pwd`#egg=dsq-postgres[tests]" --use-mirrors
 
 test: build
 	python runtests.py -x

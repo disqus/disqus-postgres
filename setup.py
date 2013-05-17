@@ -1,20 +1,6 @@
 import sys
-import warnings
 
-try:
-    import multiprocessing
-except:
-    pass
-
-try:
-    from notsetuptools import setup
-except ImportError:
-    # If you are using namespaces you should **not** allow installation of your package without
-    # using the ``notsetuptools`` package.
-    warnings.warn('You are missing the ``notsetuptools`` package; falling back to ``setuptools``.')
-    from setuptools import setup
-
-from setuptools import find_packages
+from setuptools import setup, find_packages
 
 
 if 'nosetests' == sys.argv[1]:
@@ -30,7 +16,7 @@ tests_require = [
 
 requires = [
     'psycopg2',
-    'Django>=1.2,<1.4',
+    'Django>=1.3,<1.6',
 ]
 
 entry_points = {
